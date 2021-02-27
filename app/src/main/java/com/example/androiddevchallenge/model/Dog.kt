@@ -31,4 +31,5 @@ class Dog(
     @SerializedName("avatar_filename")
     val avatarFilename: String,
     val introduction: String,
-    var adopted: Boolean) : Parcelable
+    var adopted: Boolean
+) : Parcelable

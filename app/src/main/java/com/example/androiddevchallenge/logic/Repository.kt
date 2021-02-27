@@ -32,5 +32,4 @@ class Repository(private val dataHelper: DataHelper) {
     suspend fun getDogs() = withContext(Dispatchers.IO) {
         dataHelper.getDogs()
     }
-
 }

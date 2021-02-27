@@ -65,8 +65,7 @@ class MainActivity : BaseActivity() {
     }
 
     private val startForResult =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult())
-        { result: ActivityResult ->
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.let {
                     val adopted = it.getBooleanExtra(ADOPTED, false)

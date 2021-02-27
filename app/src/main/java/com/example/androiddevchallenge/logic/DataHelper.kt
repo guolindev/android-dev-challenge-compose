@@ -15,8 +15,8 @@
  */
 package com.example.androiddevchallenge.logic
 
-import com.example.androiddevchallenge.model.Dog
 import com.example.androiddevchallenge.GlobalApp
+import com.example.androiddevchallenge.model.Dog
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
@@ -55,5 +55,4 @@ class DataHelper {
         job.join()
         dogs
     }
-
 }

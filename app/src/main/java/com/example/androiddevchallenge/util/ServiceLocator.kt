@@ -35,5 +35,4 @@ object ServiceLocator {
      * Provide the DataHelper instance that Repository should depend on.
      */
     private fun provideDataHelper() = DataHelper()
-
 }

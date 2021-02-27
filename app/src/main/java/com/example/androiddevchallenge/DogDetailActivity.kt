@@ -22,12 +22,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -83,7 +83,6 @@ class DogDetailActivity : BaseActivity() {
         setResult(RESULT_OK, intent)
         finish()
     }
-
 }
 
 var showConfirmDialog by mutableStateOf(false)
@@ -198,19 +197,23 @@ fun AdoptConfirmDialog(dog: Dog) {
             )
         },
         confirmButton = {
-            Button(onClick = {
-                showConfirmDialog = false
-                dog.adopted = true
-            }) {
+            Button(
+                onClick = {
+                    showConfirmDialog = false
+                    dog.adopted = true
+                }
+            ) {
                 Text(
                     text = "Yes"
                 )
             }
         },
         dismissButton = {
-            Button(onClick = {
-                showConfirmDialog = false
-            }) {
+            Button(
+                onClick = {
+                    showConfirmDialog = false
+                }
+            ) {
                 Text(
                     text = "No"
                 )
