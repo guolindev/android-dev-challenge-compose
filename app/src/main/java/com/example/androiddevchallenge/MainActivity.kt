@@ -15,9 +15,13 @@
  */
 package com.example.androiddevchallenge
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -30,7 +34,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
@@ -57,28 +61,48 @@ import com.example.androiddevchallenge.util.Resource
 
 class MainActivity : AppCompatActivity() {
 
-    private val mainViewModel by lazy {
+    private val viewModel by lazy {
         ViewModelProvider(this, MainViewModelFactory()).get(MainViewModel::class.java)
     }
+
+    private val startForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+        { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.let {
+                    val adopted = it.getBooleanExtra(ADOPTED, false)
+                    val position = it.getIntExtra(SELECTED_POSITION, 0)
+                    if (adopted) {
+                        viewModel.setDogAdopted(position)
+                    }
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyTheme {
-                DisplayDogList(dogsLiveData = mainViewModel.dogsLiveData) {
-                    Toast.makeText(this, "Dog is clicked", Toast.LENGTH_SHORT).show()
+                DisplayDogList(dogsLiveData = viewModel.dogsLiveData) { position, dog ->
+                    Intent(this, DogDetailActivity::class.java).apply {
+                        putExtra(SELECTED_POSITION, position)
+                        putExtra(SELECTED_DOG, dog)
+                        startForResult.launch(this)
+                    }
                 }
             }
         }
-
         // Read and parse the contacts data and get notified by observer when data is ready.
-        mainViewModel.readAndParseData()
+        viewModel.readAndParseData()
     }
 }
 
 // Start building your app here!
 @Composable
-fun DisplayDogList(dogsLiveData: LiveData<Resource<List<Dog>>>, onClick: () -> Unit) {
+fun DisplayDogList(
+    dogsLiveData: LiveData<Resource<List<Dog>>>,
+    onClick: (position: Int, dog: Dog) -> Unit
+) {
     val resource by dogsLiveData.observeAsState()
     resource?.let {
         when (it.status) {
@@ -91,8 +115,8 @@ fun DisplayDogList(dogsLiveData: LiveData<Resource<List<Dog>>>, onClick: () -> U
                             .padding(top = 8.dp, bottom = 8.dp)
                     ) {
                         LazyColumn(Modifier.fillMaxWidth()) {
-                            items(dogs) { dog ->
-                                DisplayDogItem(dog, onClick)
+                            itemsIndexed(dogs) { position, dog ->
+                                DisplayDogItem(position, dog, onClick)
                             }
                         }
                     }
@@ -120,7 +144,7 @@ fun DisplayDogList(dogsLiveData: LiveData<Resource<List<Dog>>>, onClick: () -> U
 }
 
 @Composable
-fun DisplayDogItem(dog: Dog, onClick: () -> Unit) {
+fun DisplayDogItem(position: Int, dog: Dog, onClick: (position: Int, dog: Dog) -> Unit) {
     Card(
         elevation = 4.dp,
         shape = RoundedCornerShape(4.dp),
@@ -128,7 +152,7 @@ fun DisplayDogItem(dog: Dog, onClick: () -> Unit) {
             .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
             .fillMaxWidth()
             .requiredHeight(220.dp)
-            .clickable { onClick() }
+            .clickable { onClick(position, dog) }
     ) {
         CardItem(name = dog.name, avatar = dog.avatarFilename)
     }
@@ -138,7 +162,8 @@ fun DisplayDogItem(dog: Dog, onClick: () -> Unit) {
 fun CardItem(name: String, avatar: String) {
     val imageIdentity = GlobalApp.context.resources.getIdentifier(
         avatar, "drawable",
-        GlobalApp.context.packageName)
+        GlobalApp.context.packageName
+    )
     val image: Painter = painterResource(imageIdentity)
     Image(
         painter = image,

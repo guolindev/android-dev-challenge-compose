@@ -15,7 +15,9 @@
  */
 package com.example.androiddevchallenge.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
 /**
  * The model class represents the data in dogs.json.
@@ -23,13 +25,10 @@ import com.google.gson.annotations.SerializedName
  * @author Lin Guo
  * @since 2021/2/26
  */
-open class Dog(
+@Parcelize
+class Dog(
     val name: String,
     @SerializedName("avatar_filename")
     val avatarFilename: String,
-    val introduction: String) {
-    /**
-     * Indicates this contact is selected or not.
-     */
-    var adopted = false
-}
+    val introduction: String,
+    var adopted: Boolean) : Parcelable

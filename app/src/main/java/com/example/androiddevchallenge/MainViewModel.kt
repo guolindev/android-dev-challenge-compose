@@ -41,6 +41,8 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
 
     private val _dogsLiveData = MutableLiveData<Resource<List<Dog>>>()
 
+    private val dogs = mutableListOf<Dog>()
+
     /**
      * The handler to handle coroutine exceptions and notify to the observer.
      */
@@ -54,7 +56,15 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
      */
     fun readAndParseData() = viewModelScope.launch(handler) {
         _dogsLiveData.value = Resource.loading()
-        val dogs = repository.getDogs()
+        dogs.addAll(repository.getDogs())
         _dogsLiveData.value = Resource.success(dogs)
+    }
+
+    /**
+     * Set the specific dog as adopted.
+     */
+    fun setDogAdopted(position: Int) {
+        dogs[position].adopted = true
+        _dogsLiveData.value = _dogsLiveData.value
     }
 }

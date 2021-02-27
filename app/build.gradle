@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -76,6 +77,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.0'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0"
     implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     testImplementation 'junit:junit:4.13.2'
 

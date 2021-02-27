@@ -42,7 +42,7 @@ class DataHelper {
         var dogs: List<Dog> = ArrayList()
         val job = launch(Dispatchers.IO) {
             try {
-                delay(2000) // Make sure we can see the loading progress.
+                delay(1500) // Make sure we can see the loading progress.
                 val assetsManager = GlobalApp.context.assets
                 val inputReader = InputStreamReader(assetsManager.open("dogs.json"))
                 val jsonString = BufferedReader(inputReader).readText()
