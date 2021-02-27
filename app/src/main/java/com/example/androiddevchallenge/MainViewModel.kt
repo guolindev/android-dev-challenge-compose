@@ -57,5 +57,4 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         val dogs = repository.getDogs()
         _dogsLiveData.value = Resource.success(dogs)
     }
-
 }

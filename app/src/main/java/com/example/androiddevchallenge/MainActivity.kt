@@ -20,12 +20,13 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -64,7 +65,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyTheme {
-                DisplayDogList(dogsLiveData = mainViewModel.dogsLiveData)
+                DisplayDogList(dogsLiveData = mainViewModel.dogsLiveData) {
+                    Toast.makeText(this, "Dog is clicked", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -75,7 +78,7 @@ class MainActivity : AppCompatActivity() {
 
 // Start building your app here!
 @Composable
-fun DisplayDogList(dogsLiveData: LiveData<Resource<List<Dog>>>) {
+fun DisplayDogList(dogsLiveData: LiveData<Resource<List<Dog>>>, onClick: () -> Unit) {
     val resource by dogsLiveData.observeAsState()
     resource?.let {
         when (it.status) {
@@ -89,7 +92,7 @@ fun DisplayDogList(dogsLiveData: LiveData<Resource<List<Dog>>>) {
                     ) {
                         LazyColumn(Modifier.fillMaxWidth()) {
                             items(dogs) { dog ->
-                                DisplayDogItem(dog)
+                                DisplayDogItem(dog, onClick)
                             }
                         }
                     }
@@ -117,7 +120,7 @@ fun DisplayDogList(dogsLiveData: LiveData<Resource<List<Dog>>>) {
 }
 
 @Composable
-fun DisplayDogItem(dog: Dog) {
+fun DisplayDogItem(dog: Dog, onClick: () -> Unit) {
     Card(
         elevation = 4.dp,
         shape = RoundedCornerShape(4.dp),
@@ -125,6 +128,7 @@ fun DisplayDogItem(dog: Dog) {
             .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
             .fillMaxWidth()
             .requiredHeight(220.dp)
+            .clickable { onClick() }
     ) {
         CardItem(name = dog.name, avatar = dog.avatarFilename)
     }
@@ -132,7 +136,8 @@ fun DisplayDogItem(dog: Dog) {
 
 @Composable
 fun CardItem(name: String, avatar: String) {
-    val imageIdentity = GlobalApp.context.resources.getIdentifier(avatar, "drawable",
+    val imageIdentity = GlobalApp.context.resources.getIdentifier(
+        avatar, "drawable",
         GlobalApp.context.packageName)
     val image: Painter = painterResource(imageIdentity)
     Image(

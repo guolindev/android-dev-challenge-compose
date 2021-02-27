@@ -39,5 +39,4 @@ class GlobalApp : Application() {
         super.onCreate()
         context = applicationContext
     }
-
 }
