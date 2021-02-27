@@ -15,7 +15,7 @@
 
     <application
         android:name=".GlobalApp"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -26,6 +26,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
+            android:exported="true"
             android:theme="@style/Theme.AndroidDevChallenge.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

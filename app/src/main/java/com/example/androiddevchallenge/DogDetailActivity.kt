@@ -16,7 +16,6 @@
 package com.example.androiddevchallenge
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -56,13 +55,14 @@ const val SELECTED_DOG = "selected_dog"
 const val SELECTED_POSITION = "selected_position"
 const val ADOPTED = "adopted"
 
-class DogDetailActivity : AppCompatActivity() {
+class DogDetailActivity : BaseActivity() {
 
     private lateinit var selectedDog: Dog
     private var selectedPosition = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setStatusBarToLight()
         val dog = intent.getParcelableExtra<Dog>(SELECTED_DOG)
         selectedPosition = intent.getIntExtra(SELECTED_POSITION, 0)
         if (dog == null) {
