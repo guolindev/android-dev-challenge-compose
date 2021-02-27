@@ -20,30 +20,32 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
+import com.example.androiddevchallenge.extension.Shadow
 import com.example.androiddevchallenge.model.Dog
 import com.example.androiddevchallenge.ui.theme.MyTheme
 import com.example.androiddevchallenge.util.Resource
 
 class MainActivity : AppCompatActivity() {
-
-    /**
-     * Dogs data read from dogs.json.
-     */
-    private val dogList = ArrayList<Dog>()
 
     private val mainViewModel by lazy {
         ViewModelProvider(this, MainViewModelFactory()).get(MainViewModel::class.java)
@@ -53,33 +55,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyTheme {
-//                MyApp()
-                SimpleCardComponent()
+                DisplayDogList(dogsLiveData = mainViewModel.dogsLiveData)
             }
         }
 
-        mainViewModel.dogsLiveData.observe(this) { resource ->
-            when (resource.status) {
-                Resource.SUCCESS -> {
-                    // Dogs data is ready.
-                    resource.data?.let { dogs ->
-                        dogList.clear()
-                        dogList.addAll(dogs)
-                        for (dog in dogs) {
-                            println("dog name = " + dog.name)
-                        }
-                    }
-                }
-                Resource.LOADING -> {
-                }
-                Resource.ERROR -> {
-                    Toast.makeText(
-                        this, "Failed to get dogs data. ${resource.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }
         // Read and parse the contacts data and get notified by observer when data is ready.
         mainViewModel.readAndParseData()
     }
@@ -87,52 +66,75 @@ class MainActivity : AppCompatActivity() {
 
 // Start building your app here!
 @Composable
-fun MyApp() {
-    Surface(color = MaterialTheme.colors.background) {
-        Text(text = "Ready... Set... GO!")
+fun DisplayDogList(dogsLiveData: LiveData<Resource<List<Dog>>>) {
+    val resource by dogsLiveData.observeAsState()
+    resource?.let {
+        when (it.status) {
+            Resource.SUCCESS -> {
+                // Dogs data is ready.
+                it.data?.let { dogs ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, bottom = 8.dp)
+                    ) {
+                        LazyColumn(Modifier.fillMaxWidth()) {
+                            items(dogs) { dog ->
+                                DisplayDogItem(dog)
+                            }
+                        }
+                    }
+                }
+            }
+            Resource.LOADING -> {
+            }
+            else -> {
+                Toast.makeText(
+                    GlobalApp.context,
+                    "Failed to get dogs data. ${it.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 }
 
-@Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Composable
-fun LightPreview() {
-    MyTheme {
-        MyApp()
-    }
-}
-
-@Preview("Dark Theme", widthDp = 360, heightDp = 640)
-@Composable
-fun DarkPreview() {
-    MyTheme(darkTheme = true) {
-        MyApp()
-    }
-}
-
-@Composable
-fun SimpleCardComponent() {
+fun DisplayDogItem(dog: Dog) {
     Card(
-        backgroundColor = Color(0xFFFFA867.toInt()),
+        elevation = 4.dp,
+        shape = RoundedCornerShape(4.dp),
         modifier = Modifier
-            .padding(16.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
             .fillMaxWidth()
+            .requiredHeight(220.dp)
     ) {
-//        Text(
-//            text = "Simple Card",
-//            textAlign = TextAlign.Center,
-//            style = TextStyle(
-//                fontSize = 16.sp
-//            ),
-//            modifier = Modifier.padding(16.dp)
-//        )
-        val image: Painter = painterResource(R.drawable.ic_launcher_foreground)
+        val imageIdentity = GlobalApp.context.resources.getIdentifier(dog.avatarFilename,
+            "drawable", GlobalApp.context.packageName)
+        val image: Painter = painterResource(imageIdentity)
         Image(
             painter = image,
-            contentDescription = "",
+            contentDescription = dog.name,
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Fit
+            contentScale = ContentScale.Crop
         )
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            Surface(
+                color = Color.Shadow,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = dog.name,
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+        }
     }
 }
