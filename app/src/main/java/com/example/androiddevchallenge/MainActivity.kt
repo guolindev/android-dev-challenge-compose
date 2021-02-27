@@ -36,8 +36,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -81,11 +83,24 @@ class MainActivity : BaseActivity() {
         setStatusBarToLight()
         setContent {
             MyTheme {
-                DisplayDogList(dogsLiveData = viewModel.dogsLiveData) { position, dog ->
-                    Intent(this, DogDetailActivity::class.java).apply {
-                        putExtra(SELECTED_POSITION, position)
-                        putExtra(SELECTED_DOG, dog)
-                        startForResult.launch(this)
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = getString(R.string.app_name),
+                                )
+                            },
+                            backgroundColor = Color.Transparent, elevation = 0.dp
+                        )
+                    }
+                ) {
+                    DisplayDogList(dogsLiveData = viewModel.dogsLiveData) { position, dog ->
+                        Intent(this, DogDetailActivity::class.java).apply {
+                            putExtra(SELECTED_POSITION, position)
+                            putExtra(SELECTED_DOG, dog)
+                            startForResult.launch(this)
+                        }
                     }
                 }
             }

@@ -33,8 +33,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,10 +47,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.androiddevchallenge.model.Dog
@@ -72,11 +76,34 @@ class DogDetailActivity : BaseActivity() {
         }
         selectedDog = dog
         setContent {
-            DisplayDogDetail(dog = selectedDog)
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = selectedDog.name
+                            )
+                        },
+                        backgroundColor = Color.Transparent, elevation = 0.dp,
+                        navigationIcon = {
+                            IconButton(onClick = { navigateBack() }) {
+                                val backIcon: Painter = painterResource(R.drawable.ic_back)
+                                Icon(painter = backIcon, contentDescription = "ic_back")
+                            }
+                        }
+                    )
+                }
+            ) {
+                DisplayDogDetail(dog = selectedDog)
+            }
         }
     }
 
     override fun onBackPressed() {
+        navigateBack()
+    }
+
+    private fun navigateBack() {
         val intent = Intent()
         intent.putExtra(SELECTED_POSITION, selectedPosition)
         intent.putExtra(ADOPTED, selectedDog.adopted)
@@ -101,22 +128,16 @@ fun DisplayDogDetail(dog: Dog) {
             name = stateDog.name
         )
         Spacer(
-            modifier = Modifier.requiredHeight(16.dp)
-        )
-        DogName(
-            name = stateDog.name
-        )
-        Spacer(
-            modifier = Modifier.requiredHeight(16.dp)
-        )
-        DogIntroduction(
-            introduction = stateDog.introduction
-        )
-        Spacer(
-            modifier = Modifier.requiredHeight(16.dp)
+            modifier = Modifier.requiredHeight(26.dp)
         )
         AdoptButton(
             adopted = stateDog.adopted
+        )
+        Spacer(
+            modifier = Modifier.requiredHeight(26.dp)
+        )
+        DogIntroduction(
+            introduction = stateDog.introduction
         )
     }
     if (showConfirmDialog) {
@@ -142,20 +163,6 @@ fun DogAvatar(avatar: String, name: String) {
                 .requiredSize(150.dp)
                 .clip(shape = CircleShape),
             contentScale = ContentScale.Crop
-        )
-    }
-}
-
-@Composable
-fun DogName(name: String) {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = name,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold
         )
     }
 }
