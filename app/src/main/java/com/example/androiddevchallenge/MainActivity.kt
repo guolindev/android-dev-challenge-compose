@@ -25,11 +25,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -87,6 +89,14 @@ fun DisplayDogList(dogsLiveData: LiveData<Resource<List<Dog>>>) {
                 }
             }
             Resource.LOADING -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
             else -> {
                 Toast.makeText(
@@ -109,32 +119,37 @@ fun DisplayDogItem(dog: Dog) {
             .fillMaxWidth()
             .requiredHeight(220.dp)
     ) {
-        val imageIdentity = GlobalApp.context.resources.getIdentifier(dog.avatarFilename,
-            "drawable", GlobalApp.context.packageName)
-        val image: Painter = painterResource(imageIdentity)
-        Image(
-            painter = image,
-            contentDescription = dog.name,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(shape = RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop
-        )
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom
+        CardItem(name = dog.name, avatar = dog.avatarFilename)
+    }
+}
+
+@Composable
+fun CardItem(name: String, avatar: String) {
+    val imageIdentity = GlobalApp.context.resources.getIdentifier(avatar, "drawable",
+        GlobalApp.context.packageName)
+    val image: Painter = painterResource(imageIdentity)
+    Image(
+        painter = image,
+        contentDescription = name,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(8.dp)),
+        contentScale = ContentScale.Crop
+    )
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        Surface(
+            color = Color.Shadow,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Surface(
-                color = Color.Shadow,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = dog.name,
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
+            Text(
+                text = name,
+                color = Color.White,
+                fontSize = 20.sp,
+                modifier = Modifier.padding(8.dp)
+            )
         }
     }
 }

@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.IOException
@@ -26,6 +27,7 @@ class DataHelper {
         var dogs: List<Dog> = ArrayList()
         val job = launch(Dispatchers.IO) {
             try {
+                delay(2000) // Make sure we can see the loading progress.
                 val assetsManager = GlobalApp.context.assets
                 val inputReader = InputStreamReader(assetsManager.open("dogs.json"))
                 val jsonString = BufferedReader(inputReader).readText()
